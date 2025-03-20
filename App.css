@@ -1,0 +1,450 @@
+@media (max-width: 768px) {
+    body {
+      background-color: lightblue;
+    }
+  }
+  
+  .container {
+    width: 90%;
+    font-size: 1.2rem;
+    border: none;
+    box-shadow: none;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  /* General Styles */
+  body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #2c3e50, #4ca1af); /* Από χρώμα στο φόντο */
+    color: white;
+    font-family: 'Verdana', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: auto;
+    width: auto;
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    margin-top: 60px;
+    border: none; /* Αφαιρεί οποιοδήποτε πλαίσιο */
+    box-shadow: none; /* Αφαιρεί οποιαδήποτε σκιά */
+  }
+  h1 {
+    font-size: 2.5rem;
+    color: white;
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  /* Ενημερωμένη διάταξη για το Upload Form */
+  .upload-container {
+    display: flex;
+    justify-content: space-between; /* Τοποθετεί τα στοιχεία αριστερά και δεξιά */
+    align-items: center;           /* Ευθυγραμμίζει τα στοιχεία κάθετα */
+    width: 80%;
+    max-width: 900px;
+    margin-top: 30px;
+  }
+  
+  /* Στυλ για το πλαίσιο εικόνας */
+  .upload-container input[type="file"] {
+    padding: 12px 15px;
+    font-size: 16px;
+    margin: 8px 0;
+    margin-right: 10px; /* Απόσταση μεταξύ του input και του κουμπιού */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 250px;
+    box-sizing: border-box;
+  }
+  
+  #saveButton {
+    background-color: green;
+    width: 200px;
+    color: white;
+    padding: 12px 25px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  #saveButton:hover {
+    background-color: rgb(26, 180, 26);
+  }
+  
+  /* Στυλ για το canvas */
+  #canvas {
+    border: 5px solid black;
+    border-radius: 10px;
+    background-color: white;
+    margin-top: 70px;
+    max-width: 100%;
+  }
+  
+  /* Responsiveness */
+  @media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+  
+    h1 {
+        font-size: 2rem;
+    }
+  
+    .upload-container {
+        flex-direction: column; /* Ταξινόμηση σε στήλες σε μικρές οθόνες */
+        align-items: flex-start;
+    }
+  
+    .upload-container input[type="file"] {
+        width: 100%;
+        margin-right: 0;
+    }
+  
+    #saveButton {
+        width: 100%;
+        margin-top: 10px;
+    }
+  
+    #canvas {
+        width: 100%;
+    }
+  }
+  /* Navbar Styling */
+  .navbar {
+    width: 100%;
+    background-color:#061320;
+    position: fixed;  /* Κρατά το navbar στη θέση του */
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navbar ul {
+    list-style: none;
+   
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+   
+  }
+  
+  .navbar ul li {
+    margin: 0 10px;
+   
+  }
+  
+  .navbar ul li a {
+    color: #05121F;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 15px 20px;
+    display: block;
+    background-color: #1C3045;
+    transition: background-color 0.3s;
+    border-radius: 10px;
+    
+  }
+  
+  .navbar ul li a:hover {
+    background-color: #0E4880;
+    color: white;
+    border-radius: 10px;
+  }
+  
+  /* Hover effect */
+  .navbar a:hover {
+    color: #007bff; /* Αυτό θα αλλάξει το χρώμα του συνδέσμου όταν περνάς τον δείκτη του ποντικιού πάνω από αυτό */
+  }
+  
+  /* Active page style */
+  .navbar a.active {
+    font-weight: bold;
+    color: #007bff; /* Χρώμα όταν είναι η ενεργή σελίδα */
+    border-bottom: 2px solid #007bff; /* Μπορείς να προσθέσεις και μια γραμμή κάτω από το ενεργό link */
+  }
+  
+  
+  
+  /* CSS για το κουμπί αλλαγής μεγέθους */
+  #resize-button {
+    width: 200px;
+    font-size: 16px;
+    background-color: #007bff; /* Μπλε χρώμα */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: 25px;
+  }
+  
+  #resize-button:hover {
+    background-color: #0056b3; /* Σκούρο μπλε χρώμα κατά την αιώρηση */
+  }
+  
+  #resize-button:active {
+    background-color: #004494; /* Ακόμα πιο σκούρο μπλε όταν πατηθεί */
+  }
+  
+  label{
+    margin-left: 10px;
+  }
+  
+  #titleInput{
+    padding: 12px 15px;
+    font-size: 16px;
+    margin: 8px 0;
+    margin-right: 10px; /* Απόσταση μεταξύ του input και του κουμπιού */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 250px;
+    box-sizing: border-box;
+  }
+  
+  #descriptionInput{
+    padding: 12px 15px;
+    font-size: 16px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 250px;
+    box-sizing: border-box;
+  }
+   
+  .buttons-container {
+    display: inline-block;
+    flex-direction: column; /* Τα κουμπιά τοποθετούνται κάθετα */
+    gap: 10px; /* Απόσταση μεταξύ των κουμπιών */
+    width: 100%; /* Τα κουμπιά καταλαμβάνουν όλο το διαθέσιμο πλάτος */
+    text-align: center;
+  }
+  
+  .button {
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+  
+  /* Στυλ για το modal */
+  .modal {
+    display: none; /* Απόκρυψη του modal */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding-top: 60px;
+  }
+  
+  .modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 300px;
+    border-radius: 8px;
+  }
+  
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
+  
+  input[type="number"] {
+    padding: 5px;
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  
+  #category{
+    border-radius: 10px ;
+    
+    padding: 5px;
+    font-size: 15px;
+    font-family: sans-serif;
+    color:white;
+    background-color: black;
+    cursor: pointer;
+  }
+  
+  
+  
+  /* Dark Mode */
+  body.dark-mode {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #808080, #121212);
+    color: white;
+    font-family: 'Verdana', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: auto;
+    width: auto;
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    margin-top: 60px;
+    border: none; /* Αφαιρεί οποιοδήποτε πλαίσιο */
+    box-shadow: none; /* Αφαιρεί οποιαδήποτε σκιά */
+  }
+  
+  
+  
+  /* Apply Dark Mode to Various Elements */
+  .dark-mode .navbar,
+  .dark-mode .box,
+  .dark-mode .container,
+  .dark-mode .card,
+  .dark-mode input,
+  .dark-mode textarea,
+  .dark-mode select {
+    background-color: #1e1e1e !important;
+    color: white;
+    border: 1px solid #555;
+  }
+  
+  .dark-mode button {
+    background-color: #333;
+    color: white;
+    border: 1px solid #666;
+  }
+  
+  .dark-mode button:hover {
+    background-color: #555;
+  }
+  
+  .dark-mode .modal-content {
+    background-color: #222;
+    color: white;
+    border: 1px solid #444;
+  }
+  
+  .dark-mode #canvas {
+    background-color: #222;
+    border: 5px solid #444;
+  }
+  
+  .dark-mode .navbar ul li a {
+    background-color: #2c2c2c;
+    color: white;
+  }
+  
+  .dark-mode .navbar ul li a:hover {
+    background-color: #444;
+    color: #ddd;
+  }
+  
+  .dark-mode input[type="file"],
+  .dark-mode input[type="number"] {
+    background-color: #1e1e1e;
+    color: white;
+    border: 1px solid #555;
+  }
+  
+  /* Dark Mode Toggle Button */
+  #darkModeToggle {
+    position: fixed;
+    top: 58px;
+    right: 10px;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    background-color: #333;
+    color: white;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  
+  #darkModeToggle:hover {
+    background-color: #555;
+  }
+  .dark-mode #resize-button,
+  .dark-mode #saveButton {
+    background-color: #444; /* Σκούρο γκρι */
+    color: white;
+    border: 1px solid #666;
+  }
+  
+  .dark-mode #resize-button:hover,
+  .dark-mode #saveButton:hover {
+    background-color: #666; /* Λίγο πιο φωτεινό γκρι */
+  }
+  
+  .message-box {
+    position: fixed;
+    top: -50px; /* Ξεκινάει εκτός οθόνης */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #444;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-size: 16px;
+    font-weight: bold;
+    opacity: 0;
+    transition: top 0.5s ease, opacity 0.5s ease;
+    z-index: 9999;
+  }
+  
+  /* Χρωματιστά μηνύματα ανάλογα με τον τύπο */
+  .message-box.success { background-color: #28a745; } /* Πράσινο για επιτυχία */
+  .message-box.error { background-color: #dc3545; }   /* Κόκκινο για λάθος */
+  .message-box.warning { background-color: #ffc107; } /* Κίτρινο για προειδοποίηση */
+  .message-box.info { background-color: #17a2b8; }    /* Μπλε για πληροφορίες */
+  
+  /* Εμφάνιση με animation */
+  .message-box.show {
+    top: 55px; /* Κατεβαίνει στη θέση του */
+    opacity: 1;
+  }
+  
