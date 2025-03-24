@@ -5,7 +5,7 @@ function Navbar({ toggleDarkMode, darkMode }) {
     <nav className="navbar">
       <ul>
         <li><a href="/">Image</a></li>
-        <li><a href="/gallery">Gallery</a></li>
+        <li><a href="/Gallery">Gallery</a></li>
       </ul>
      
     </nav>
