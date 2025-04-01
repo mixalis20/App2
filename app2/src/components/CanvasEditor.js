@@ -3,9 +3,7 @@ import ResizeModal from "./ResizeModal";
 
 function CanvasEditor({ image }) {
   const canvasRef = useRef(null);
-  const ctxRef = useRef(null);
   const [showResizeModal, setShowResizeModal] = useState(false);
-  const [category, setCategory] = useState("");
 
   useEffect(() => {
     if (!image) return;
@@ -22,24 +20,32 @@ function CanvasEditor({ image }) {
     };
   }, [image]);
 
+  // 🔹 Διορθωμένη συνάρτηση applyResize
   const applyResize = (width, height) => {
-    if (!width || !height) return;
+    if (!width || !height || width <= 0 || height <= 0) {
+      alert("Invalid dimensions! Please enter positive values.");
+      return;
+    }
+
     const canvas = canvasRef.current;
-    const ctx = ctxRef.current;
+    const ctx = canvas.getContext("2d");
+
     const img = new Image();
-    img.src = canvas.toDataURL();
+    img.src = canvas.toDataURL(); // Παίρνει την τρέχουσα εικόνα από τον καμβά
     img.onload = () => {
-      canvas.width = width;
+      canvas.width = width; // Ενημέρωση του μεγέθους του καμβά
       canvas.height = height;
-      ctx.drawImage(img, 0, 0, width, height);
+      ctx.clearRect(0, 0, width, height); // Καθαρίζει τον καμβά
+      ctx.drawImage(img, 0, 0, width, height); // Σχεδιάζει την εικόνα με το νέο μέγεθος
     };
-    setShowResizeModal(false);
+
+    setShowResizeModal(false); // Κλείσιμο του modal
   };
 
   const saveImage = () => {
     const link = document.createElement("a");
     link.href = canvasRef.current.toDataURL("image/png");
-    link.download = "annotated_image.png";
+    link.download = "resized_image.png";
     link.click();
   };
 
@@ -50,12 +56,6 @@ function CanvasEditor({ image }) {
       <div className="controls">
         <button onClick={() => setShowResizeModal(true)}>Resize Image</button>
         <button onClick={saveImage}>Save Image</button>
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="">Select Category</option>
-          <option value="nature">Nature</option>
-          <option value="city">City</option>
-          <option value="animals">Animals</option>
-        </select>
       </div>
 
       {showResizeModal && <ResizeModal closeModal={() => setShowResizeModal(false)} applyResize={applyResize} />}
