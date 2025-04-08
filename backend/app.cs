@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace App2
@@ -167,7 +168,15 @@ namespace App2
     // Startup class to configure the app
     public class Startup
     {
-        public void ConfigureServices(IApplicationBuilder app, IWebHostEnvironment env)
+        // ConfigureServices should accept IServiceCollection, not IApplicationBuilder or IWebHostEnvironment
+        public void ConfigureServices(IServiceCollection services)
+        {
+            // Register services here, for example:
+            services.AddControllersWithViews();
+        }
+
+        // Configure method remains the same, this is where you configure middleware
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -193,4 +202,5 @@ namespace App2
             });
         }
     }
+
 }
