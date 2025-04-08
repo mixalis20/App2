@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "./components/Navbar";
 import UploadPage from "./pages/UploadPage";
+
 import "./App.css";
 
 function App() {
