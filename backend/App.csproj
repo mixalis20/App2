@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <!-- Ρύθμιση του στόχου πλατφόρμας -->
+    <TargetFramework>net6.0</TargetFramework>
+
+    <!-- Ρύθμιση του τύπου εξόδου για Web API -->
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <!-- Εξαρτήσεις για το project -->
+  <ItemGroup>
+    <!-- ASP.NET Core Web API εξαρτήσεις -->
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
+
+    <!-- MongoDB εξάρτηση -->
+    <PackageReference Include="MongoDB.Driver" Version="3.2.1" />
+
+    <!-- BCrypt για κρυπτογράφηση κωδικών -->
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.1" />
+  </ItemGroup>
+
+</Project>
