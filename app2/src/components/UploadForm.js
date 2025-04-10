@@ -1,13 +1,11 @@
-import React, { useRef, useEffect, useState } from "react";
-import ResizeModal from "./ResizeModal";
+// UploadForm.js
+import React, { useState, useRef } from "react";
 
-function UploadForm() {
-  const [image, setImage] = useState(null);
-  const canvasRef = useRef(null);
-  const [showResizeModal, setShowResizeModal] = useState(false);
+function UploadForm({ onImageUpload }) {
   const [annotations, setAnnotations] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [startX, setStartX] = useState(0);
   const [startY, setStartY] = useState(0);
@@ -16,36 +14,9 @@ function UploadForm() {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => setImage(e.target.result);
+      reader.onload = (e) => onImageUpload(e.target.result);
       reader.readAsDataURL(file);
     }
-  };
-
-  useEffect(() => {
-    if (!image) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-    img.src = image;
-    img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-    };
-  }, [image]);
-
-  const applyResize = (width, height) => {
-    if (!width || !height) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-    img.src = canvas.toDataURL();
-    img.onload = () => {
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(img, 0, 0, width, height);
-    };
-    setShowResizeModal(false);
   };
 
   const handleMouseDown = (e) => {
@@ -58,6 +29,7 @@ function UploadForm() {
   const handleMouseUp = (e) => {
     if (!isDrawing) return;
     setIsDrawing(false);
+
     const rect = canvasRef.current.getBoundingClientRect();
     const endX = e.clientX - rect.left;
     const endY = e.clientY - rect.top;
@@ -74,41 +46,50 @@ function UploadForm() {
     setAnnotations([...annotations, newAnnotation]);
     setTitle("");
     setDescription("");
-    drawAnnotations();
+    drawAnnotations([...annotations, newAnnotation]);
   };
 
-  const drawAnnotations = () => {
+  const drawAnnotations = (annotationsToDraw) => {
     const ctx = canvasRef.current.getContext("2d");
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-    const img = new Image();
-    img.src = image;
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0);
-      annotations.forEach((ann) => {
-        ctx.strokeStyle = "blue";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(ann.x, ann.y, ann.width, ann.height);
-        ctx.font = "12px Arial";
-        ctx.fillText(ann.title, ann.x, ann.y - 5);
-      });
-    };
+
+    annotationsToDraw.forEach((annotation) => {
+      ctx.strokeStyle = "blue";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(annotation.x, annotation.y, annotation.width, annotation.height);
+      ctx.font = "12px Arial";
+      ctx.fillText(annotation.title, annotation.x, annotation.y - 5);
+    });
   };
 
   return (
     <div className="upload-container">
       <label>Upload Image:</label>
       <input type="file" accept="image/*" onChange={handleUpload} />
-      <canvas ref={canvasRef} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp}></canvas>
-      <div className="controls">
-        <button onClick={() => setShowResizeModal(true)}>Resize Image</button>
+
+      <label>Title:</label>
+      <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Enter annotation title..." />
+
+      <label>Description:</label>
+      <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Enter annotation description..." />
+
+      <canvas
+        ref={canvasRef}
+        width={500}
+        height={400}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        className="annotation-canvas"
+      ></canvas>
+
+      <div>
+        <h3>Annotations:</h3>
+        <ul>
+          {annotations.map((ann, index) => (
+            <li key={index}>{ann.title}: {ann.description}</li>
+          ))}
+        </ul>
       </div>
-      {showResizeModal && <ResizeModal closeModal={() => setShowResizeModal(false)} applyResize={applyResize} />}
-      <h3>Annotations:</h3>
-      <ul>
-        {annotations.map((ann, index) => (
-          <li key={index}>{ann.title}: {ann.description}</li>
-        ))}
-      </ul>
     </div>
   );
 }
