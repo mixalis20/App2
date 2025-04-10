@@ -1,0 +1,73 @@
+@media (max-width: 768px) {
+    body {
+      background-color: lightblue;
+    }
+  }
+  .container {
+    width: 90%;
+    font-size: 1.2rem;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  
+  
+  
+  /* Navbar Styling */
+  .navbar {
+      width: 100%;
+      background-color:#061320;
+      position: fixed;  /* Κρατά το navbar στη θέση του */
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .navbar ul {
+      list-style: none;
+     
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+     
+    }
+    
+    .navbar ul li {
+      margin: 0 10px;
+     
+    }
+    
+    .navbar ul li a {
+      color: #05121F;
+      text-decoration: none;
+      font-size: 18px;
+      padding: 15px 20px;
+      display: block;
+      background-color: #1C3045;
+      transition: background-color 0.3s;
+      border-radius: 10px;
+      
+    }
+    
+    .navbar ul li a:hover {
+      background-color: #0E4880;
+      color: white;
+      border-radius: 10px;
+    }
+    
+    /* Hover effect */
+    .navbar a:hover {
+      color: #007bff; /* Αυτό θα αλλάξει το χρώμα του συνδέσμου όταν περνάς τον δείκτη του ποντικιού πάνω από αυτό */
+    }
+    
+    /* Active page style */
+    .navbar a.active {
+      font-weight: bold;
+      color: #007bff; /* Χρώμα όταν είναι η ενεργή σελίδα */
+      border-bottom: 2px solid #007bff; /* Μπορείς να προσθέσεις και μια γραμμή κάτω από το ενεργό link */
+    }
+    

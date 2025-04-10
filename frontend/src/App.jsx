@@ -1,35 +1,50 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// App.js
+import React, { useState, useRef } from 'react';
+import Navbar from './components/Navbar';
+import UploadForm from './components/UploadForm.jsx';
+import CanvasArea from './components/CanvasArea.jsx';
+import ResizeModal from './components/ResizeModal.jsx';
+import MessageBox from './components/MessageBox.jsx';
+import  './App.css';
+import './Navbar.css';
+import './CanvasArea.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [image, setImage] = useState(null);
+  const [annotations, setAnnotations] = useState([]);
+  const [showResize, setShowResize] = useState(false);
+  const [message, setMessage] = useState({ text: '', type: '' });
+  const canvasRef = useRef(null);
+
+  const showMessage = (text, type = 'info') => {
+    setMessage({ text, type });
+    setTimeout(() => setMessage({ text: '', type: '' }), 3000);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="app">
+      <Navbar toggleDark />
+      {message.text && <MessageBox text={message.text} type={message.type} />}
+      <h1>Upload Image</h1>
+      <UploadForm setImage={setImage} showMessage={showMessage} />
+      <CanvasArea
+        image={image}
+        annotations={annotations}
+        setAnnotations={setAnnotations}
+        canvasRef={canvasRef}
+      />
+      <button onClick={() => setShowResize(true)} className="button">Resize Image</button>
+      <ResizeModal
+        show={showResize}
+        onClose={() => setShowResize(false)}
+        image={image}
+        canvasRef={canvasRef}
+        annotations={annotations}
+        setAnnotations={setAnnotations}
+        showMessage={showMessage}
+      />
+    </div>
+  );
+};
 
-export default App
+export default App;

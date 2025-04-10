@@ -1,0 +1,20 @@
+.canvas-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .input-container {
+    display: flex;
+    justify-content: center;  /* Τοποθετεί τα inputs στο κέντρο */
+    gap: 10px;  /* Δημιουργεί απόσταση μεταξύ των inputs */
+    margin-bottom: 10px;  /* Προσθέτει απόσταση από το canvas */
+  }
+  
+  input {
+    padding: 5px;
+    font-size: 14px;
+  }
+  
