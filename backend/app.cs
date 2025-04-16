@@ -2,14 +2,18 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;  
+using MongoDB.Bson;
 using MongoDB.Driver;
-using Microsoft.Extensions.Hosting; 
-using System;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-
+using System.Text;
+using System;
 
 namespace App2
 {
@@ -32,10 +36,12 @@ namespace App2
     public class UserController : ControllerBase
     {
         private readonly MongoDBContext _context;
+        private readonly IConfiguration _configuration;
 
-        public UserController(MongoDBContext context)
+        public UserController(MongoDBContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         [HttpPost("register")]
@@ -59,7 +65,11 @@ namespace App2
 
             await _context.Users.InsertOneAsync(user);
 
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id.ToString() }, user);
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id.ToString() }, new {
+                user.Id,
+                user.Username,
+                user.CreatedAt
+            });
         }
 
         [HttpPost("login")]
@@ -69,34 +79,40 @@ namespace App2
                 return BadRequest("Invalid login data.");
 
             var user = await _context.Users.Find(u => u.Username == loginDto.Username).FirstOrDefaultAsync();
-            if (user == null)
+            if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
                 return Unauthorized("Invalid username or password.");
 
-            if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
-                return Unauthorized("Invalid username or password.");
-
-            return Ok("Login successful.");
+            var token = GenerateJwtToken(user.Id.ToString());
+            return Ok(new { Token = token });
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(string id)
         {
-            var objectId = new ObjectId(id);
-            var user = await _context.Users.Find(u => u.Id == objectId).FirstOrDefaultAsync();
+            if (!ObjectId.TryParse(id, out var objectId))
+                return BadRequest("Invalid user ID format.");
 
+            var user = await _context.Users.Find(u => u.Id == objectId).FirstOrDefaultAsync();
             if (user == null)
                 return NotFound();
 
-            return Ok(user);
+            return Ok(new
+            {
+                user.Id,
+                user.Username,
+                user.CreatedAt,
+                user.ImageIds
+            });
         }
 
         [HttpPost("{userId}/images")]
-        public async Task<IActionResult> UploadImageForUser(string userId, IFormFile file)
+        public async Task<IActionResult> UploadImageForUser(string userId, [FromForm] IFormFile file)
         {
+            if (!ObjectId.TryParse(userId, out var userObjectId))
+                return BadRequest("Invalid user ID format.");
+
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded.");
-
-            var userObjectId = new ObjectId(userId);
 
             var imageData = new byte[file.Length];
             using (var stream = file.OpenReadStream())
@@ -117,23 +133,47 @@ namespace App2
             var update = Builders<User>.Update.Push(u => u.ImageIds, image.Id);
             await _context.Users.UpdateOneAsync(u => u.Id == userObjectId, update);
 
-            return CreatedAtAction(nameof(GetImage), new { id = image.Id.ToString() }, image);
+            return CreatedAtAction(nameof(GetImage), new { id = image.Id.ToString() }, new
+            {
+                image.Id,
+                image.Name,
+                image.ContentType
+            });
         }
 
         [HttpGet("images/{id}")]
         public async Task<IActionResult> GetImage(string id)
         {
-            var objectId = new ObjectId(id);
-            var image = await _context.Images.Find(img => img.Id == objectId).FirstOrDefaultAsync();
+            if (!ObjectId.TryParse(id, out var objectId))
+                return BadRequest("Invalid image ID format.");
 
+            var image = await _context.Images.Find(img => img.Id == objectId).FirstOrDefaultAsync();
             if (image == null)
                 return NotFound();
 
             return File(image.ImageData, image.ContentType, image.Name);
         }
+
+        private string GenerateJwtToken(string userId)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Secret"]);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[] {
+                    new Claim("userId", userId)
+                }),
+                Expires = DateTime.UtcNow.AddDays(1),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
     }
 
-    // DTOs for User Register and Login
+// DTOs for User Register and Login
     public class UserRegisterDto
     {
         public string Username { get; set; }
@@ -146,7 +186,6 @@ namespace App2
         public string Password { get; set; }
     }
 
-    // Example of Image and User classes
     public class Image
     {
         public ObjectId Id { get; set; }
@@ -165,17 +204,21 @@ namespace App2
         public List<ObjectId> ImageIds { get; set; } = new List<ObjectId>();
     }
 
-    // Startup class to configure the app
     public class Startup
     {
-        // ConfigureServices should accept IServiceCollection, not IApplicationBuilder or IWebHostEnvironment
-        public void ConfigureServices(IServiceCollection services)
+        public IConfiguration Configuration { get; }
+
+        public Startup(IConfiguration configuration)
         {
-            // Register services here, for example:
-            services.AddControllersWithViews();
+            Configuration = configuration;
         }
 
-        // Configure method remains the same, this is where you configure middleware
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddControllers();
+            services.AddSingleton(new MongoDBContext(Configuration["MongoDB:ConnectionString"]));
+        }
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -196,11 +239,8 @@ namespace App2
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "App2",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllers(); // Using attribute routing
             });
         }
     }
-
 }
