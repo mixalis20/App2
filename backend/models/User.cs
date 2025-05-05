@@ -12,7 +12,7 @@ namespace App2.Models
         public ObjectId Id { get; set; }
         
         public string Username { get; set; }
-        public string Email { get; set; }
+        public string Password { get; set; }
         public DateTime CreatedAt { get; set; }
         
         // Σχέση χρήστη με εικόνες - ο χρήστης μπορεί να έχει πολλές εικόνες
