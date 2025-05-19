@@ -2,21 +2,26 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
-using MongoDB.Driver;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using System.IO;
 using System.Text;
 using System;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authorization;
 
 namespace App2
 {
+    // MongoDB context
     public class MongoDBContext
     {
         private readonly IMongoDatabase _database;
@@ -31,6 +36,50 @@ namespace App2
         public IMongoCollection<User> Users => _database.GetCollection<User>("Users");
     }
 
+    // Models
+    public class User
+    {
+        public ObjectId Id { get; set; }
+        public string Username { get; set; }
+        public string PasswordHash { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public List<ObjectId> ImageIds { get; set; } = new List<ObjectId>();
+    }
+
+    public class Image
+    {
+        [Key]
+        public ObjectId Id { get; set; }
+
+        [Required]
+        public string ImageUrl { get; set; }
+
+        public List<Annotation> Annotations { get; set; } = new();
+        public List<string> Tags { get; set; } = new();
+        public List<string> Category { get; set; }
+        public bool Deleted { get; set; } = false;
+    }
+
+    public class Annotation
+    {
+        public string Title { get; set; }
+        public string Description { get; set; }
+    }
+
+    // DTOs
+    public class UserRegisterDto
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+
+    public class UserLoginDto
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+
+    // Controller
     [Route("api/users")]
     [ApiController]
     public class UserController : ControllerBase
@@ -65,9 +114,11 @@ namespace App2
 
             await _context.Users.InsertOneAsync(user);
 
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id.ToString() }, new {
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id.ToString() }, new
+            {
                 user.Id,
                 user.Username,
+                user.PasswordHash,
                 user.CreatedAt
             });
         }
@@ -87,6 +138,7 @@ namespace App2
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetUser(string id)
         {
             if (!ObjectId.TryParse(id, out var objectId))
@@ -105,39 +157,53 @@ namespace App2
             });
         }
 
-        [HttpPost("{userId}/images")]
-        public async Task<IActionResult> UploadImageForUser(string userId, [FromForm] IFormFile file)
+        [HttpPost("api/images")]
+        [Authorize]
+        public async Task<IActionResult> UploadImageForAuthenticatedUser([FromForm] IFormFile file)
         {
-            if (!ObjectId.TryParse(userId, out var userObjectId))
-                return BadRequest("Invalid user ID format.");
-
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded.");
 
-            var imageData = new byte[file.Length];
-            using (var stream = file.OpenReadStream())
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!ObjectId.TryParse(userId, out var userObjectId))
+                return Unauthorized("Invalid user ID in token.");
+
+            var user = await _context.Users.Find(u => u.Id == userObjectId).FirstOrDefaultAsync();
+            if (user == null)
+                return NotFound("User not found.");
+
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                await stream.ReadAsync(imageData, 0, (int)file.Length);
+                await file.CopyToAsync(stream);
             }
+
+            var imageUrl = $"/uploads/{uniqueFileName}";
 
             var image = new Image
             {
-                Name = file.FileName,
-                ImageData = imageData,
-                ContentType = file.ContentType,
-                UserId = userObjectId
+                ImageUrl = imageUrl,
+                Category = new List<string>(),
+                Tags = new List<string>(),
+                Annotations = new List<Annotation>()
             };
 
             await _context.Images.InsertOneAsync(image);
 
-            var update = Builders<User>.Update.Push(u => u.ImageIds, image.Id);
+            user.ImageIds.Add(image.Id);
+            var update = Builders<User>.Update.Set(u => u.ImageIds, user.ImageIds);
             await _context.Users.UpdateOneAsync(u => u.Id == userObjectId, update);
 
             return CreatedAtAction(nameof(GetImage), new { id = image.Id.ToString() }, new
             {
                 image.Id,
-                image.Name,
-                image.ContentType
+                image.ImageUrl
             });
         }
 
@@ -147,24 +213,43 @@ namespace App2
             if (!ObjectId.TryParse(id, out var objectId))
                 return BadRequest("Invalid image ID format.");
 
-            var image = await _context.Images.Find(img => img.Id == objectId).FirstOrDefaultAsync();
+            var image = await _context.Images.Find(i => i.Id == objectId).FirstOrDefaultAsync();
             if (image == null)
                 return NotFound();
 
-            return File(image.ImageData, image.ContentType, image.Name);
+            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", image.ImageUrl.TrimStart('/'));
+            if (!System.IO.File.Exists(fullPath))
+                return NotFound("Image file not found on server.");
+
+            var contentType = GetContentType(fullPath);
+            var imageData = await System.IO.File.ReadAllBytesAsync(fullPath);
+            return File(imageData, contentType, Path.GetFileName(fullPath));
+        }
+
+        private string GetContentType(string path)
+        {
+            var types = new Dictionary<string, string>
+            {
+                { ".jpg", "image/jpeg" },
+                { ".jpeg", "image/jpeg" },
+                { ".png", "image/png" },
+                { ".gif", "image/gif" }
+            };
+
+            var ext = Path.GetExtension(path).ToLowerInvariant();
+            return types.ContainsKey(ext) ? types[ext] : "application/octet-stream";
         }
 
         private string GenerateJwtToken(string userId)
         {
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Secret"]);
-
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] {
-                    new Claim("userId", userId)
+                    new Claim(ClaimTypes.NameIdentifier, userId)
                 }),
-                Expires = DateTime.UtcNow.AddDays(1),
+                Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -173,40 +258,11 @@ namespace App2
         }
     }
 
-// DTOs for User Register and Login
-    public class UserRegisterDto
-    {
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
-
-    public class UserLoginDto
-    {
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
-
-    public class Image
-    {
-        public ObjectId Id { get; set; }
-        public string Name { get; set; }
-        public byte[] ImageData { get; set; }
-        public string ContentType { get; set; }
-        public ObjectId UserId { get; set; }
-    }
-
-    public class User
-    {
-        public ObjectId Id { get; set; }
-        public string Username { get; set; }
-        public string PasswordHash { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public List<ObjectId> ImageIds { get; set; } = new List<ObjectId>();
-    }
-
+    // Startup
     public class Startup
     {
         public IConfiguration Configuration { get; }
+        public string ConnectionString { get; private set; }
 
         public Startup(IConfiguration configuration)
         {
@@ -216,30 +272,48 @@ namespace App2
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton(new MongoDBContext(Configuration["MongoDB:ConnectionString"]));
+
+           var mongoConnectionString = Configuration["MongoDB:ConnectionString"];
+           services.AddSingleton(new MongoDBContext(mongoConnectionString));
+
+
+            var key = Encoding.ASCII.GetBytes(Configuration["Jwt:Secret"]);
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
             else
-            {
                 app.UseExceptionHandler("/Home/Error");
-                app.UseHsts();
-            }
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers(); // Using attribute routing
+                endpoints.MapControllers();
             });
         }
     }
