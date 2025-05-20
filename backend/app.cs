@@ -30,6 +30,7 @@ namespace App2
         {
             var client = new MongoClient(connectionString);
             _database = client.GetDatabase("ImageDatabase");
+            _database = client.GetDatabase("UserDatabase");
         }
 
         public IMongoCollection<Image> Images => _database.GetCollection<Image>("Images");
