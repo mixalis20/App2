@@ -284,3 +284,52 @@ canvas {
     flex: 1 1 100%;
   }
 }
+
+.ham-menu {
+  width: 30px;
+  height: 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  margin-right: 15px;
+}
+
+.ham-menu span {
+  display: block;
+  height: 3px;
+  background: black;
+  border-radius: 2px;
+  transition: background 0.3s ease;
+}
+
+.ham-menu.active span {
+  background: red;
+}
+
+.off-screen-menu {
+  position: fixed;
+  top: 0;
+  right: -250px;
+  width: 250px;
+  height: 100%;
+  background: #eee;
+  transition: right 0.3s ease;
+  padding: 20px;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+
+.off-screen-menu.active {
+  right: 0;
+}
+
+.off-screen-menu ul {
+  list-style: none;
+  padding: 0;
+}
+
+.off-screen-menu ul li {
+  margin-bottom: 10px;
+}
+

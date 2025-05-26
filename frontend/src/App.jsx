@@ -6,10 +6,41 @@ import './CanvasArea.css';
 
 import Gallery from './Gallery';  // Εδώ το import
 
+// --- HamburgerMenu Component ---
+const HamburgerMenu = () => {
+  const [active, setActive] = useState(false);
+
+  const toggleMenu = () => setActive(!active);
+
+  return (
+    <>
+      <div 
+        className={`ham-menu ${active ? 'active' : ''}`} 
+        onClick={toggleMenu} 
+        style={{ cursor: 'pointer' }}
+        aria-label="Toggle menu"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <nav className={`off-screen-menu ${active ? 'active' : ''}`}>
+        <ul>
+          <li><a href="#item1">Item 1</a></li>
+          <li><a href="#item2">Item 2</a></li>
+          <li><a href="#item3">Item 3</a></li>
+        </ul>
+      </nav>
+    </>
+  );
+};
+
 // === Navbar ===
 const Navbar = () => {
   return (
     <div className="navbar">
+      <HamburgerMenu />
       <ul>
         <li><a href="App.jsx" id="imageLink">Image</a></li>
         <li><a href="Gallery.jsx" id="galleryLink">Gallery</a></li>
