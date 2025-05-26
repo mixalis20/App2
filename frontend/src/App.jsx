@@ -1,15 +1,21 @@
-// App.jsx
 import React, { useState, useRef, useEffect } from 'react';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useNavigate
+} from 'react-router-dom';
+
 import './App.css';
 import './Navbar.css';
 import './CanvasArea.css';
 
-import Gallery from './Gallery';  // Εδώ το import
+import Gallery from './Gallery'; // Υπόθεση: έχεις αυτό το component
 
 // --- HamburgerMenu Component ---
 const HamburgerMenu = () => {
   const [active, setActive] = useState(false);
-
   const toggleMenu = () => setActive(!active);
 
   return (
@@ -27,35 +33,44 @@ const HamburgerMenu = () => {
 
       <nav className={`off-screen-menu ${active ? 'active' : ''}`}>
         <ul>
-          <li><a href="#item1">Item 1</a></li>
-          <li><a href="#item2">Item 2</a></li>
-          <li><a href="#item3">Item 3</a></li>
+          <li><Link to="/" onClick={() => setActive(false)}>Upload</Link></li>
+          <li><Link to="/gallery" onClick={() => setActive(false)}>Gallery</Link></li>
         </ul>
       </nav>
     </>
   );
 };
 
-// === Navbar ===
+// --- Navbar ---
 const Navbar = () => {
   return (
     <div className="navbar">
       <HamburgerMenu />
       <ul>
-        <li><a href="App.jsx" id="imageLink">Image</a></li>
-        <li><a href="Gallery.jsx" id="galleryLink">Gallery</a></li>
+        <li><Link to="/">Upload</Link></li>
+        <li><Link to="/gallery">Gallery</Link></li>
       </ul>
     </div>
   );
 };
 
-// === MessageBox ===
+// --- MessageBox ---
 const MessageBox = ({ text, type }) => {
   return <div className={`message-box ${type}`}>{text}</div>;
 };
 
-// === UploadForm with inline annotation fields ===
-const UploadForm = ({ setImage, showMessage, title, setTitle, description, setDescription, annotations, category, setCategory }) => {
+// --- UploadForm ---
+const UploadForm = ({
+  setImage,
+  showMessage,
+  title,
+  setTitle,
+  description,
+  setDescription,
+  annotations,
+  category,
+  setCategory
+}) => {
 
   const handleUpload = (e) => {
     const file = e.target.files[0];
@@ -72,6 +87,10 @@ const UploadForm = ({ setImage, showMessage, title, setTitle, description, setDe
 
   const handleSave = async () => {
     const canvas = document.querySelector('canvas');
+    if (!canvas) {
+      showMessage('Δεν υπάρχει καμβάς.', 'error');
+      return;
+    }
     const imageData = canvas.toDataURL();
 
     if (!imageData || category === '--') {
@@ -136,7 +155,7 @@ const UploadForm = ({ setImage, showMessage, title, setTitle, description, setDe
   );
 };
 
-// === CanvasArea ===
+// --- CanvasArea ---
 const CanvasArea = ({ image, annotations, setAnnotations, canvasRef, title, description }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [startPoint, setStartPoint] = useState({ x: 0, y: 0 });
@@ -171,6 +190,7 @@ const CanvasArea = ({ image, annotations, setAnnotations, canvasRef, title, desc
   };
 
   const handleMouseDown = (e) => {
+    if (!image) return;
     const rect = canvasRef.current.getBoundingClientRect();
     setStartPoint({ x: e.clientX - rect.left, y: e.clientY - rect.top });
     setIsDrawing(true);
@@ -192,6 +212,7 @@ const CanvasArea = ({ image, annotations, setAnnotations, canvasRef, title, desc
   };
 
   const handleMouseUp = (e) => {
+    if (!image) return;
     setIsDrawing(false);
 
     const rect = canvasRef.current.getBoundingClientRect();
@@ -223,8 +244,8 @@ const CanvasArea = ({ image, annotations, setAnnotations, canvasRef, title, desc
   );
 };
 
-// === App ===
-const App = () => {
+// --- UploadPage Component (όλος ο κώδικας upload) ---
+const UploadPage = () => {
   const [image, setImage] = useState(null);
   const [annotations, setAnnotations] = useState([]);
   const [message, setMessage] = useState({ text: '', type: '' });
@@ -279,7 +300,6 @@ const App = () => {
 
   return (
     <div className="app">
-      <Navbar />
       {message.text && <MessageBox text={message.text} type={message.type} />}
       <h1 style={{ textAlign: 'center', marginBottom: '20px', color: '#3f51b5' }}>Upload Image</h1>
       <UploadForm
@@ -294,7 +314,6 @@ const App = () => {
         setCategory={setCategory}
       />
 
-      {/* Buttons centered */}
       <div className="button-group">
         <button onClick={() => setAnnotations([])} className="button">Καθαρισμός σημειώσεων</button>
         <button onClick={() => setShowResizeModal(true)} className="button">Resize Image</button>
@@ -342,6 +361,19 @@ const App = () => {
         </div>
       )}
     </div>
+  );
+};
+
+// --- Main App with Router ---
+const App = () => {
+  return (
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<UploadPage />} />
+        <Route path="/gallery" element={<Gallery />} />
+      </Routes>
+    </Router>
   );
 };
 

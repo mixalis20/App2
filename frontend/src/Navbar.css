@@ -72,16 +72,20 @@
 }
 
 nav {
-    padding: 1rem;
-    display: flex;
-    background-color: rgb(34, 37, 49);
+  padding: 1rem;
+  display: flex;
+  background-color: rgb(34, 37, 49);
+  align-items: center;      /* Κεντράρει κάθετα */
+  justify-content: flex-start;  /* Σπρώχνει τα items προς τα αριστερά */
 }
 
 .ham-menu {
   height: 50px;
   width: 50px;
-  margin-left: auto;
   position: relative;
+   margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
 }
 .ham-menu span {
   height: 5px;
@@ -137,25 +141,30 @@ nav {
 .off-screen-menu {
   position: fixed;
   top: 0;
-  right: -250px;
+  left: -250px; /* Από δεξιά -> αριστερά */
   width: 250px;
   height: 100%;
   background: #eee;
-  transition: right 0.3s ease;
+  transition: left 0.3s ease;
   padding: 20px;
-  box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+  box-shadow: 2px 0 5px rgba(0,0,0,0.3); /* Σκιά προς τα δεξιά */
   z-index: 1000;
+  
 }
 
 .off-screen-menu.active {
-  right: 0;
+  left: 0; /* Άνοιγμα από αριστερά */
 }
+
 
 .off-screen-menu ul {
   list-style: none;
   padding: 0;
 }
 
-.off-screen-menu ul li {
+.off-screen-menu ul li a {
   margin-bottom: 10px;
+  color:black;
 }
+
+
