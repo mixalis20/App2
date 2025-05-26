@@ -1,82 +1,105 @@
 /* App.css */
 
-/* Reset & base */
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+/* Root variables */
+:root {
+  --primary: #1976d2;
+  --primary-hover: #155a9e;
+  --success: #dcedc8;
+  --success-text: #33691e;
+  --error: #ffcdd2;
+  --error-text: #b71c1c;
+  --info: #e3f2fd;
+  --info-text: #0277bd;
+  --text: #222;
+  --bg: #f0f4f8;
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Base reset */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Inter', sans-serif;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: #f5f7fa;
-  color: #333;
+  background: linear-gradient(145deg, #e6ecf3, #fdfdff);
+  color: var(--text);
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding: 2rem;
+  animation: fadeIn 1s ease;
 }
 
 /* Main app container */
 .app {
   max-width: 900px;
   width: 100%;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 12px 25px rgba(0,0,0,0.1);
-  padding: 2rem 3rem;
+  background: var(--card-bg);
+  backdrop-filter: blur(8px);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 2.5rem 3rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  animation: popIn 0.6s ease;
 }
 
 /* Headings */
 h1 {
   font-weight: 700;
-  font-size: 2rem;
-  color: #222;
+  font-size: 2.2rem;
+  color: var(--text);
   text-align: center;
   margin-bottom: 1rem;
 }
 
-/* MessageBox styles */
+/* MessageBox */
 .message-box {
   padding: 1rem 1.5rem;
-  border-radius: 8px;
+  border-radius: 10px;
   font-weight: 600;
   text-align: center;
   max-width: 500px;
   margin: 0 auto 1rem auto;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
 }
 
 .message-box.info {
-  background: #e3f2fd;
-  color: #0277bd;
+  background: var(--info);
+  color: var(--info-text);
 }
 
 .message-box.success {
-  background: #dcedc8;
-  color: #558b2f;
+  background: var(--success);
+  color: var(--success-text);
 }
 
 .message-box.error {
-  background: #ffcdd2;
-  color: #b71c1c;
+  background: var(--error);
+  color: var(--error-text);
 }
 
-/* UploadForm styles */
+/* Upload Form */
 .upload-form {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.8rem;
+  gap: 2rem;
   justify-content: center;
 }
 
 .upload-form > div {
-  flex: 1 1 220px;
+  flex: 1 1 240px;
   display: flex;
   flex-direction: column;
 }
@@ -87,33 +110,26 @@ h1 {
   color: #444;
 }
 
-.upload-form input[type="file"] {
-  padding: 0.3rem 0.5rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  transition: border-color 0.25s ease;
-}
-
-.upload-form input[type="file"]:hover {
-  border-color: #888;
-}
-
+.upload-form input[type="file"],
 .upload-form select,
 .upload-form input[type="text"] {
-  padding: 0.5rem 0.7rem;
-  border-radius: 8px;
-  border: 1.5px solid #ddd;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  border: 1.5px solid #ccc;
   font-size: 1rem;
-  transition: border-color 0.3s ease;
+  transition: 0.3s;
 }
 
+.upload-form input[type="file"]:hover,
 .upload-form select:hover,
-.upload-form input[type="text"]:hover,
-.upload-form select:focus,
-.upload-form input[type="text"]:focus {
-  border-color: #1976d2;
-  outline: none;
+.upload-form input[type="text"]:hover {
+  border-color: var(--primary);
+}
+
+.upload-form input:focus,
+.upload-form select:focus {
+  outline: 2px solid var(--primary);
+  border-color: var(--primary);
 }
 
 .upload-form input[type="text"]::placeholder {
@@ -122,31 +138,33 @@ h1 {
 }
 
 .upload-form button.button {
-  background: #1976d2;
+  background: var(--primary);
   border: none;
-  padding: 0.65rem 1.2rem;
-  border-radius: 10px;
+  padding: 0.7rem 1.5rem;
+  border-radius: 12px;
   color: white;
   font-weight: 700;
   cursor: pointer;
   align-self: center;
-  transition: background-color 0.3s ease;
+  transition: 0.3s;
   box-shadow: 0 6px 10px rgba(25, 118, 210, 0.3);
 }
 
 .upload-form button.button:hover {
-  background: #155a9e;
+  background: var(--primary-hover);
   box-shadow: 0 8px 15px rgba(21, 90, 158, 0.4);
 }
 
-/* CanvasArea styles */
+/* Canvas Area */
 .canvas-area {
   display: flex;
   justify-content: center;
-  border: 2px solid #ddd;
+  border: 2px dashed #ccc;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+  padding: 1rem;
+  background: #fff;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
 }
 
 canvas {
@@ -158,24 +176,24 @@ canvas {
 /* Buttons */
 .button, .modal-button {
   cursor: pointer;
-  background-color: #3f51b5;
+  background-color: var(--primary);
   color: white;
   font-weight: 600;
   border: none;
-  padding: 10px 18px;
-  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
   font-size: 15px;
-  transition: background-color 0.3s ease;
+  transition: 0.3s ease;
   margin: 0 5px;
   box-shadow: 0 4px 7px rgba(63, 81, 181, 0.4);
 }
 
 .button:hover, .modal-button:hover {
-  background-color: #303f9f;
+  background-color: var(--primary-hover);
   box-shadow: 0 6px 10px rgba(48, 63, 159, 0.6);
 }
 
-/* Center buttons container */
+/* Button group */
 .button-group {
   display: flex;
   justify-content: center;
@@ -189,7 +207,7 @@ canvas {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -198,25 +216,25 @@ canvas {
 
 .modal-content {
   background: #fff;
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 2rem 2.5rem;
-  max-width: 400px;
+  max-width: 420px;
   width: 90%;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
   gap: 1.3rem;
+  animation: popIn 0.4s ease;
 }
 
 .modal-content h2 {
   text-align: center;
-  color: #1976d2;
+  color: var(--primary);
   margin-bottom: 1rem;
   font-weight: 700;
-  font-size: 1.6rem;
+  font-size: 1.7rem;
 }
 
-/* Modal input fields */
 .modal-content label {
   font-weight: 600;
   color: #555;
@@ -232,11 +250,11 @@ canvas {
 }
 
 .modal-content input[type="number"]:focus {
-  border-color: #1976d2;
+  border-color: var(--primary);
   outline: none;
 }
 
-/* Modal buttons (save/cancel) */
+/* Modal Buttons */
 .modal-buttons {
   display: flex;
   justify-content: center;
@@ -256,12 +274,12 @@ canvas {
 }
 
 .modal-buttons .save-btn {
-  background: #1976d2;
+  background: var(--primary);
   color: #fff;
 }
 
 .modal-buttons .save-btn:hover {
-  background: #155a9e;
+  background: var(--primary-hover);
 }
 
 .modal-buttons .cancel-btn {
@@ -274,15 +292,36 @@ canvas {
   color: #333;
 }
 
-/* Responsive tweaks */
+/* Responsive */
 @media (max-width: 600px) {
   .upload-form {
     flex-direction: column;
   }
-  
+
   .upload-form > div {
     flex: 1 1 100%;
   }
 }
 
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

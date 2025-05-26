@@ -1,59 +1,3 @@
-import React, { useState, useRef, useEffect } from 'react';
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link
-} from 'react-router-dom';
-
-import './App.css';
-import CanvasArea from "./components/CanvasArea";
-import Navbar from './components/Navbar';
-import UploadForm from "./components/Upload";
-
-
-
-import Gallery from './Gallery';
-
-// --- HamburgerMenu Component ---
-const HamburgerMenu = () => {
-  const [active, setActive] = useState(false);
-  const toggleMenu = () => setActive(!active);
-
-  return (
-    <>
-      <div 
-        className={`ham-menu ${active ? 'active' : ''}`} 
-        onClick={toggleMenu} 
-        style={{ cursor: 'pointer' }}
-        aria-label="Toggle menu"
-      >
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-
-      <nav className={`off-screen-menu ${active ? 'active' : ''}`}>
-        <ul>
-          <li><Link to="/" onClick={() => setActive(false)}>Upload</Link></li>
-          <li><Link to="/gallery" onClick={() => setActive(false)}>Gallery</Link></li>
-        </ul>
-      </nav>
-    </>
-  );
-};
-
-
-
-// --- MessageBox ---
-const MessageBox = ({ text, type }) => {
-  return <div className={`message-box ${type}`}>{text}</div>;
-};
-
-
-
-
-
 // --- UploadPage ---
 const UploadPage = () => {
   const [image, setImage] = useState(null);
@@ -195,18 +139,3 @@ const UploadPage = () => {
     </div>
   );
 };
-
-// --- Main App with Router ---
-const App = () => {
-  return (
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<UploadPage />} />
-        <Route path="/gallery" element={<Gallery />} />
-      </Routes>
-    </Router>
-  );
-};
-
-export default App;
