@@ -22,7 +22,7 @@ const MessageBox = ({ text, type }) => {
 };
 
 // === UploadForm with inline annotation fields ===
-const UploadForm = ({ setImage, showMessage, title, setTitle, description, setDescription }) => {
+const UploadForm = ({ setImage, showMessage, title, setTitle, description, setDescription, annotations }) => {
   const [category, setCategory] = useState('--');
 
   const handleUpload = (e) => {
@@ -39,27 +39,42 @@ const UploadForm = ({ setImage, showMessage, title, setTitle, description, setDe
   };
 
   const handleSave = async () => {
-    const canvas = document.querySelector('canvas');
-    const imageData = canvas.toDataURL();
+  const canvas = document.querySelector('canvas');
+  const imageData = canvas.toDataURL();
 
-    if (!imageData || category === '--') {
-      showMessage('Επιλέξτε εικόνα και κατηγορία!', 'error');
-      return;
-    }
+  if (!imageData || category === '--') {
+    showMessage('Επιλέξτε εικόνα και κατηγορία!', 'error');
+    return;
+  }
 
-    try {
-      const response = await fetch('http://localhost:5000/api/images', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: imageData, annotations: [], category }),
-      });
+// 👇 Εδώ βλέπεις τα δεδομένα στο console
+  console.log("📦 Τιμή annotations:", annotations);
+  console.log("📝 Τίτλος εικόνας:", title);
+  console.log("📝 Περιγραφή εικόνας:", description);
+  console.log("📂 Κατηγορία:", category);
 
-      response.ok ? showMessage('Επιτυχής αποθήκευση!', 'success') : showMessage('Σφάλμα στην αποθήκευση.', 'error');
-    } catch (err) {
-      console.error(err);
-      showMessage('Σφάλμα σύνδεσης με server.', 'error');
-    }
-  };
+  try {
+    const response = await fetch('http://localhost:5000/api/images', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image: imageData,
+        annotations,
+        category,
+        title,
+        description
+      }),
+    });
+
+    response.ok
+      ? showMessage('Επιτυχής αποθήκευση!', 'success')
+      : showMessage('Σφάλμα στην αποθήκευση.', 'error');
+  } catch (err) {
+    console.error(err);
+    showMessage('Σφάλμα σύνδεσης με server.', 'error');
+  }
+};
+
 
   return (
     <div className="upload-form" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
@@ -179,12 +194,15 @@ const CanvasArea = ({ image, annotations, setAnnotations, canvasRef, title, desc
 
 // === App ===
 const App = () => {
+   console.log("App component render");
   const [image, setImage] = useState(null);
   const [annotations, setAnnotations] = useState([]);
   const [message, setMessage] = useState({ text: '', type: '' });
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('--'); // 👈 προστέθηκε αυτό
   const canvasRef = useRef(null);
+
 
   const showMessage = (text, type = 'info') => {
     setMessage({ text, type });
@@ -197,13 +215,19 @@ const App = () => {
       {message.text && <MessageBox text={message.text} type={message.type} />}
       <h1>Upload Image</h1>
       <UploadForm
-        setImage={setImage}
-        showMessage={showMessage}
-        title={title}
-        setTitle={setTitle}
-        description={description}
-        setDescription={setDescription}
-      />
+      setImage={setImage}
+      showMessage={showMessage}
+      title={title}
+      setTitle={setTitle}
+      description={description}
+      setDescription={setDescription}
+      annotations={annotations}
+      category={category}
+      setCategory={setCategory}
+       
+  />
+
+      <button onClick={() => setAnnotations([])}>Καθαρισμός σημειώσεων</button>
       <CanvasArea
         image={image}
         annotations={annotations}
