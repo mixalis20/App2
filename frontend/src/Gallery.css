@@ -1,0 +1,35 @@
+/* Gallery.css */
+.gallery {
+  padding: 20px;
+}
+
+.gallery-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.gallery-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 300px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.gallery-item canvas {
+  width: 100%;
+  height: auto;
+  border: 1px solid #000;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.image-info h3 {
+  margin: 0 0 5px 0;
+}
+
+.image-info p {
+  margin: 0 0 5px 0;
+  font-size: 0.9em;
+  color: #555;
+}

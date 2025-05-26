@@ -1,390 +1,286 @@
-@media (max-width: 768px) {
-  body {
-    background-color: lightblue;
-  }
-}
+/* App.css */
 
-.container {
-  width: 90%;
-  font-size: 1.2rem;
-  border: none;
-  box-shadow: none;
-}
-img {
-  max-width: 100%;
-  height: auto;
-}
-/* General Styles */
-body {
+/* Reset & base */
+* {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  background: linear-gradient(to bottom, #2c3e50, #4ca1af); /* Από χρώμα στο φόντο */
-  color: white;
-  font-family: 'Verdana', sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: #f5f7fa;
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+}
+
+/* Main app container */
+.app {
+  max-width: 900px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+  padding: 2rem 3rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  height: auto;
-  width: auto;
-  box-sizing: border-box;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  margin-top: 60px;
-  border: none; /* Αφαιρεί οποιοδήποτε πλαίσιο */
-  box-shadow: none; /* Αφαιρεί οποιαδήποτε σκιά */
+  gap: 2rem;
 }
+
+/* Headings */
 h1 {
-  font-size: 2.5rem;
-  color: white;
-  margin-top: 20px;
+  font-weight: 700;
+  font-size: 2rem;
+  color: #222;
   text-align: center;
+  margin-bottom: 1rem;
 }
 
-/* Ενημερωμένη διάταξη για το Upload Form */
-.upload-container {
+/* MessageBox styles */
+.message-box {
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-align: center;
+  max-width: 500px;
+  margin: 0 auto 1rem auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.message-box.info {
+  background: #e3f2fd;
+  color: #0277bd;
+}
+
+.message-box.success {
+  background: #dcedc8;
+  color: #558b2f;
+}
+
+.message-box.error {
+  background: #ffcdd2;
+  color: #b71c1c;
+}
+
+/* UploadForm styles */
+.upload-form {
   display: flex;
-  justify-content: space-between; /* Τοποθετεί τα στοιχεία αριστερά και δεξιά */
-  align-items: center;           /* Ευθυγραμμίζει τα στοιχεία κάθετα */
-  width: 80%;
-  max-width: 900px;
-  margin-top: 30px;
+  flex-wrap: wrap;
+  gap: 1.8rem;
+  justify-content: center;
 }
 
-/* Στυλ για το πλαίσιο εικόνας */
-.upload-container input[type="file"] {
-  padding: 12px 15px;
-  font-size: 16px;
-  margin: 8px 0;
-  margin-right: 10px; /* Απόσταση μεταξύ του input και του κουμπιού */
+.upload-form > div {
+  flex: 1 1 220px;
+  display: flex;
+  flex-direction: column;
+}
+
+.upload-form label {
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #444;
+}
+
+.upload-form input[type="file"] {
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
   border: 1px solid #ccc;
-  border-radius: 5px;
-  width: 250px;
-  box-sizing: border-box;
-}
-
-#saveButton {
-  background-color: green;
-  width: 200px;
-  color: white;
-  padding: 12px 25px;
-  font-size: 16px;
-  border: none;
-  border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: border-color 0.25s ease;
 }
 
-#saveButton:hover {
-  background-color: rgb(26, 180, 26);
+.upload-form input[type="file"]:hover {
+  border-color: #888;
 }
 
-
-/* Responsiveness */
-@media (max-width: 768px) {
-  body {
-      padding: 10px;
-  }
-
-  h1 {
-      font-size: 2rem;
-  }
-
-  .upload-container {
-      flex-direction: column; /* Ταξινόμηση σε στήλες σε μικρές οθόνες */
-      align-items: flex-start;
-  }
-
-  .upload-container input[type="file"] {
-      width: 100%;
-      margin-right: 0;
-  }
-
-  #saveButton {
-      width: 100%;
-      margin-top: 10px;
-  }
-
-  #canvas {
-      width: 100%;
-  }
+.upload-form select,
+.upload-form input[type="text"] {
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  border: 1.5px solid #ddd;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
 }
 
+.upload-form select:hover,
+.upload-form input[type="text"]:hover,
+.upload-form select:focus,
+.upload-form input[type="text"]:focus {
+  border-color: #1976d2;
+  outline: none;
+}
 
+.upload-form input[type="text"]::placeholder {
+  color: #aaa;
+  font-style: italic;
+}
 
-
-/* CSS για το κουμπί αλλαγής μεγέθους */
-#resize-button {
-  width: 200px;
-  font-size: 16px;
-  background-color: #007bff; /* Μπλε χρώμα */
-  color: white;
+.upload-form button.button {
+  background: #1976d2;
   border: none;
-  border-radius: 5px;
+  padding: 0.65rem 1.2rem;
+  border-radius: 10px;
+  color: white;
+  font-weight: 700;
   cursor: pointer;
+  align-self: center;
   transition: background-color 0.3s ease;
-  margin-left: 25px;
+  box-shadow: 0 6px 10px rgba(25, 118, 210, 0.3);
 }
 
-#resize-button:hover {
-  background-color: #0056b3; /* Σκούρο μπλε χρώμα κατά την αιώρηση */
+.upload-form button.button:hover {
+  background: #155a9e;
+  box-shadow: 0 8px 15px rgba(21, 90, 158, 0.4);
 }
 
-#resize-button:active {
-  background-color: #004494; /* Ακόμα πιο σκούρο μπλε όταν πατηθεί */
+/* CanvasArea styles */
+.canvas-area {
+  display: flex;
+  justify-content: center;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.05);
 }
 
-label{
-  margin-left: 10px;
+canvas {
+  max-width: 100%;
+  height: auto !important;
+  display: block;
 }
 
-#titleInput{
-  padding: 12px 15px;
-  font-size: 16px;
-  margin: 8px 0;
-  margin-right: 10px; /* Απόσταση μεταξύ του input και του κουμπιού */
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  width: 250px;
-  box-sizing: border-box;
-}
-
-#descriptionInput{
-  padding: 12px 15px;
-  font-size: 16px;
-  margin: 8px 0;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  width: 250px;
-  box-sizing: border-box;
-}
- 
-.buttons-container {
-  display: inline-block;
-  flex-direction: column; /* Τα κουμπιά τοποθετούνται κάθετα */
-  gap: 10px; /* Απόσταση μεταξύ των κουμπιών */
-  width: 100%; /* Τα κουμπιά καταλαμβάνουν όλο το διαθέσιμο πλάτος */
-  text-align: center;
-}
-
-.button {
-  padding: 10px 20px;
-  font-size: 14px;
+/* Buttons */
+.button, .modal-button {
   cursor: pointer;
-  background-color: #4CAF50;
+  background-color: #3f51b5;
   color: white;
+  font-weight: 600;
   border: none;
-  border-radius: 5px;
-  transition: background-color 0.3s;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 15px;
+  transition: background-color 0.3s ease;
+  margin: 0 5px;
+  box-shadow: 0 4px 7px rgba(63, 81, 181, 0.4);
 }
 
-/* Στυλ για το modal */
-.modal {
-  display: none; /* Απόκρυψη του modal */
+.button:hover, .modal-button:hover {
+  background-color: #303f9f;
+  box-shadow: 0 6px 10px rgba(48, 63, 159, 0.6);
+}
+
+/* Center buttons container */
+.button-group {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* Modal styles */
+.modal-overlay {
   position: fixed;
-  z-index: 1;
-  left: 0;
   top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.4);
-  padding-top: 60px;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
 .modal-content {
-  background-color: #fefefe;
-  margin: 5% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 300px;
-  border-radius: 8px;
-}
-
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-button {
-  padding: 10px 20px;
-  margin-top: 10px;
-  font-size: 14px;
-  cursor: pointer;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: #45a049;
-}
-
-input[type="number"] {
-  padding: 5px;
-  width: 100%;
-  margin-top: 5px;
-  margin-bottom: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
-
-
-#category{
-  border-radius: 10px ;
-  
-  padding: 5px;
-  font-size: 15px;
-  font-family: sans-serif;
-  color:white;
-  background-color: black;
-  cursor: pointer;
-}
-
-
-
-/* Dark Mode */
-body.dark-mode {
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(to bottom, #808080, #121212);
-  color: white;
-  font-family: 'Verdana', sans-serif;
+  background: #fff;
+  border-radius: 14px;
+  padding: 2rem 2.5rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  height: auto;
-  width: auto;
-  box-sizing: border-box;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  margin-top: 60px;
-  border: none; /* Αφαιρεί οποιοδήποτε πλαίσιο */
-  box-shadow: none; /* Αφαιρεί οποιαδήποτε σκιά */
+  gap: 1.3rem;
 }
 
-
-
-/* Apply Dark Mode to Various Elements */
-.dark-mode .navbar,
-.dark-mode .box,
-.dark-mode .container,
-.dark-mode .card,
-.dark-mode input,
-.dark-mode textarea,
-.dark-mode select {
-  background-color: #1e1e1e !important;
-  color: white;
-  border: 1px solid #555;
+.modal-content h2 {
+  text-align: center;
+  color: #1976d2;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  font-size: 1.6rem;
 }
 
-.dark-mode button {
-  background-color: #333;
-  color: white;
-  border: 1px solid #666;
+/* Modal input fields */
+.modal-content label {
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 0.3rem;
 }
 
-.dark-mode button:hover {
-  background-color: #555;
+.modal-content input[type="number"] {
+  padding: 0.6rem 1rem;
+  border: 1.5px solid #ddd;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
 }
 
-.dark-mode .modal-content {
-  background-color: #222;
-  color: white;
-  border: 1px solid #444;
+.modal-content input[type="number"]:focus {
+  border-color: #1976d2;
+  outline: none;
 }
 
-.dark-mode #canvas {
-  background-color: #222;
-  border: 5px solid #444;
+/* Modal buttons (save/cancel) */
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
 }
 
-.dark-mode .navbar ul li a {
-  background-color: #2c2c2c;
-  color: white;
-}
-
-.dark-mode .navbar ul li a:hover {
-  background-color: #444;
-  color: #ddd;
-}
-
-.dark-mode input[type="file"],
-.dark-mode input[type="number"] {
-  background-color: #1e1e1e;
-  color: white;
-  border: 1px solid #555;
-}
-
-/* Dark Mode Toggle Button */
-#darkModeToggle {
-  position: fixed;
-  top: 58px;
-  right: 10px;
-  padding: 10px 15px;
-  border: none;
+.modal-buttons button {
+  flex: 1;
+  padding: 0.7rem 1rem;
+  border-radius: 12px;
+  font-weight: 700;
   cursor: pointer;
-  background-color: #333;
-  color: white;
-  border-radius: 5px;
-  font-size: 14px;
+  border: none;
+  box-shadow: 0 6px 12px rgba(25, 118, 210, 0.35);
+  transition: background-color 0.3s ease;
 }
 
-#darkModeToggle:hover {
-  background-color: #555;
-}
-.dark-mode #resize-button,
-.dark-mode #saveButton {
-  background-color: #444; /* Σκούρο γκρι */
-  color: white;
-  border: 1px solid #666;
+.modal-buttons .save-btn {
+  background: #1976d2;
+  color: #fff;
 }
 
-.dark-mode #resize-button:hover,
-.dark-mode #saveButton:hover {
-  background-color: #666; /* Λίγο πιο φωτεινό γκρι */
+.modal-buttons .save-btn:hover {
+  background: #155a9e;
 }
 
-.message-box {
-  position: fixed;
-  top: -50px; /* Ξεκινάει εκτός οθόνης */
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #444;
-  color: white;
-  padding: 12px 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  font-size: 16px;
-  font-weight: bold;
-  opacity: 0;
-  transition: top 0.5s ease, opacity 0.5s ease;
-  z-index: 9999;
+.modal-buttons .cancel-btn {
+  background: #ddd;
+  color: #555;
 }
 
+.modal-buttons .cancel-btn:hover {
+  background: #bbb;
+  color: #333;
+}
 
-
-
-/* Χρωματιστά μηνύματα ανάλογα με τον τύπο */
-.message-box.success { background-color: #28a745; } /* Πράσινο για επιτυχία */
-.message-box.error { background-color: #dc3545; }   /* Κόκκινο για λάθος */
-.message-box.warning { background-color: #ffc107; } /* Κίτρινο για προειδοποίηση */
-.message-box.info { background-color: #17a2b8; }    /* Μπλε για πληροφορίες */
-
-/* Εμφάνιση με animation */
-.message-box.show {
-  top: 55px; /* Κατεβαίνει στη θέση του */
-  opacity: 1;
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  .upload-form {
+    flex-direction: column;
+  }
+  
+  .upload-form > div {
+    flex: 1 1 100%;
+  }
 }
