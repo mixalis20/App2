@@ -48,9 +48,7 @@ const UploadForm = ({
         <label>Description:</label><br />
         <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Enter description..." />
       </div>
-      <div>
-        <button onClick={onSave} className="button">Save Image</button>
-      </div>
+      
     </div>
   );
 };

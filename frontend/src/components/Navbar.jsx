@@ -20,12 +20,15 @@ const HamburgerMenu = () => {
         <span></span>
       </div>
 
-      <nav className={`off-screen-menu ${active ? 'active' : ''}`}>
-        <ul>
-          <li><Link to="/" onClick={() => setActive(false)}>Upload</Link></li>
-          <li><Link to="/gallery" onClick={() => setActive(false)}>Gallery</Link></li>
-        </ul>
-      </nav>
+     <nav className={`off-screen-menu ${active ? 'active' : ''}`}>
+  <ul>
+    <li><Link to="/settings" onClick={() => setActive(false)}>⚙️ Ρυθμίσεις</Link></li>
+    <li><Link to="/help" onClick={() => setActive(false)}>❓ Οδηγίες Χρήσης</Link></li>
+    <li><Link to="/contact" onClick={() => setActive(false)}>📬 Επικοινωνία</Link></li>
+    <li><Link to="/about" onClick={() => setActive(false)}>ℹ️ Σχετικά με Εμάς</Link></li>
+  </ul>
+</nav>
+
     </>
   );
 };
