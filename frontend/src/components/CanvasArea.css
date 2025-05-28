@@ -17,4 +17,111 @@
     padding: 5px;
     font-size: 14px;
   }
-  
+  .annotation-editor {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #aaa;
+  background-color: #f9f9f9;
+  width: 300px;
+}
+
+.annotation-editor label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.annotation-editor input,
+.annotation-editor textarea {
+  width: 100%;
+  margin-top: 5px;
+}
+
+.modal-overlay {
+  position: fixed;
+  width: 200vh;
+  height: 180vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+}
+
+.modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 12px;
+  padding: 25px 30px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  max-height: 80vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+
+
+.modal-content h4 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+  color: #333;
+}
+
+.modal-content label {
+  display: block;
+  margin-bottom: 15px;
+  font-weight: 600;
+  color: #444;
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 1rem;
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+  resize: vertical;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus {
+  border-color: #3f51b5;
+  outline: none;
+}
+
+.modal-content textarea {
+  min-height: 80px;
+}
+
+.modal-content button {
+  padding: 8px 16px;
+  margin-right: 10px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modal-content button:first-of-type {
+  background-color: #3f51b5;
+  color: white;
+}
+
+.modal-content button:first-of-type:hover {
+  background-color: #303f9f;
+}
+
+.modal-content button:last-of-type {
+  background-color: #eee;
+  color: #555;
+}
+
+.modal-content button:last-of-type:hover {
+  background-color: #ccc;
+}
