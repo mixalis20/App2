@@ -11,6 +11,7 @@ const UploadPage = () => {
   const [showResizeModal, setShowResizeModal] = useState(false);
   const [resizeWidth, setResizeWidth] = useState(0);
   const [resizeHeight, setResizeHeight] = useState(0);
+  
 
   const showMessage = (text, type = 'info') => {
     setMessage({ text, type });

@@ -1,127 +1,86 @@
 .canvas-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
-  
-  .input-container {
-    display: flex;
-    justify-content: center;  /* Τοποθετεί τα inputs στο κέντρο */
-    gap: 10px;  /* Δημιουργεί απόσταση μεταξύ των inputs */
-    margin-bottom: 10px;  /* Προσθέτει απόσταση από το canvas */
-  }
-  
-  input {
-    padding: 5px;
-    font-size: 14px;
-  }
-  .annotation-editor {
-  margin-top: 20px;
-  padding: 10px;
-  border: 1px solid #aaa;
-  background-color: #f9f9f9;
+  position: relative;
+  display: flex;
+  justify-content: center;  /* οριζόντια στο κέντρο */
+  align-items: center;      /* κάθετα στο κέντρο, αν θες */
+  /* Αν θέλεις να καλύπτει όλο το ύψος της σελίδας: */ 
+}
+
+
+.settings-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 22px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.annotation-editor-sidebar {
+  position: absolute;
+  top: 60px;
+  right: -320px;
   width: 300px;
-}
-
-.annotation-editor label {
-  display: block;
-  margin-bottom: 10px;
-}
-
-.annotation-editor input,
-.annotation-editor textarea {
-  width: 100%;
-  margin-top: 5px;
+  padding: 15px;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 999;
+  border-radius: 8px;
 }
 
 .modal-overlay {
   position: fixed;
-  width: 200vh;
-  height: 180vh;
-  background-color: rgba(0, 0, 0, 0.7);
-  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
 }
 
 .modal-content {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   background-color: white;
-  border-radius: 12px;
-  padding: 25px 30px;
-  max-width: 400px;
-  width: 90%;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  max-height: 80vh;
-  overflow-y: auto;
-  box-sizing: border-box;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
 }
-
-
-
-.modal-content h4 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 1.4rem;
-  color: #333;
-}
-
-.modal-content label {
-  display: block;
-  margin-bottom: 15px;
-  font-weight: 600;
-  color: #444;
-}
-
-.modal-content input,
-.modal-content textarea {
-  width: 100%;
-  padding: 8px 10px;
-  font-size: 1rem;
-  border: 1.5px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
-  transition: border-color 0.2s ease;
-  resize: vertical;
-}
-
-.modal-content input:focus,
-.modal-content textarea:focus {
-  border-color: #3f51b5;
-  outline: none;
-}
-
-.modal-content textarea {
-  min-height: 80px;
-}
-
-.modal-content button {
-  padding: 8px 16px;
-  margin-right: 10px;
-  font-size: 1rem;
-  border-radius: 6px;
+.settings-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
   border: none;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  z-index: 1000;
+  transition: transform 0.3s ease;
 }
 
-.modal-content button:first-of-type {
-  background-color: #3f51b5;
-  color: white;
+.settings-button:hover {
+  transform: rotate(20deg);
 }
 
-.modal-content button:first-of-type:hover {
-  background-color: #303f9f;
-}
 
-.modal-content button:last-of-type {
-  background-color: #eee;
-  color: #555;
-}
-
-.modal-content button:last-of-type:hover {
-  background-color: #ccc;
+.annotation-editor-sidebar {
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  width: 250px;
+  background: white;
+  padding: 15px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  border-radius: 8px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }

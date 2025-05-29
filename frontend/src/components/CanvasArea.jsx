@@ -1,13 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
+import { FaCog } from 'react-icons/fa';
+
+
 import "./CanvasArea.css";
 
-const CanvasArea = ({ image, annotations, setAnnotations, canvasRef, title, description }) => {
+const CanvasArea = ({ image, annotations, setAnnotations, canvasRef, title, description, }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [startPoint, setStartPoint] = useState({ x: 0, y: 0 });
   const ctxRef = useRef(null);
+
   const [selectedAnnotationIndex, setSelectedAnnotationIndex] = useState(null);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
+  const [showSidebar, setShowSidebar] = useState(false);
 
   useEffect(() => {
     if (canvasRef.current && image) {
@@ -58,27 +63,6 @@ const CanvasArea = ({ image, annotations, setAnnotations, canvasRef, title, desc
     ctx.lineWidth = 2;
     ctx.strokeRect(startPoint.x, startPoint.y, endX - startPoint.x, endY - startPoint.y);
   };
-const handleCanvasClick = (e) => {
-  if (!canvasRef.current || !image) return;
-
-  const rect = canvasRef.current.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  const clickY = e.clientY - rect.top;
-
-  // Έλεγχος αν έγινε κλικ σε annotation
-  annotations.forEach((ann, index) => {
-    if (
-      clickX >= ann.x &&
-      clickX <= ann.x + ann.width &&
-      clickY >= ann.y &&
-      clickY <= ann.y + ann.height
-    ) {
-      setSelectedAnnotationIndex(index);
-      setEditTitle(ann.title);
-      setEditDescription(ann.description);
-    }
-  });
-};
 
   const handleMouseUp = (e) => {
     if (!image) return;
@@ -98,60 +82,97 @@ const handleCanvasClick = (e) => {
     };
 
     setAnnotations((prev) => [...prev, newAnnotation]);
+    setEditTitle('');
+    setEditDescription('');
+
+  };
+
+  const handleCanvasClick = (e) => {
+    if (!canvasRef.current || !image) return;
+
+    const rect = canvasRef.current.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
+
+    annotations.forEach((ann, index) => {
+      if (
+        clickX >= ann.x &&
+        clickX <= ann.x + ann.width &&
+        clickY >= ann.y &&
+        clickY <= ann.y + ann.height
+      ) {
+        setSelectedAnnotationIndex(index);
+        setEditTitle(ann.title);
+        setEditDescription(ann.description);
+      }
+    });
   };
 
   return (
-  <div className="canvas-area">
-    <canvas
-      ref={canvasRef}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onClick={handleCanvasClick}
-      style={{ border: "1px solid black", marginTop: "10px" }}
-    />
-
-    {selectedAnnotationIndex !== null && (
-  <div className="modal-overlay" onClick={() => setSelectedAnnotationIndex(null)}>
-    <div
-      className="modal-content"
-      onClick={(e) => e.stopPropagation()} // σταματάει το κλείσιμο αν κάνεις κλικ μέσα στο modal
-    >
-      <h4>Επεξεργασία Σχολίου</h4>
-      <label>
-        Τίτλος:
-        <input
-          type="text"
-          value={editTitle}
-          onChange={(e) => setEditTitle(e.target.value)}
-        />
-      </label>
-      <label>
-        Περιγραφή:
-        <textarea
-          value={editDescription}
-          onChange={(e) => setEditDescription(e.target.value)}
-        />
-      </label>
+    <div className="canvas-area">
       <button
-        onClick={() => {
-          const updated = [...annotations];
-          updated[selectedAnnotationIndex].title = editTitle;
-          updated[selectedAnnotationIndex].description = editDescription;
-          setAnnotations(updated);
-          setSelectedAnnotationIndex(null);
-        }}
-      >
-        Αποθήκευση
-      </button>
-      <button onClick={() => setSelectedAnnotationIndex(null)}>Άκυρο</button>
+  className="settings-button"
+  onClick={() => setShowSidebar((prev) => !prev)}
+>
+  <FaCog size={24} />
+</button>
+
+
+      <canvas
+        ref={canvasRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onClick={handleCanvasClick}
+        style={{ border: "1px solid black", marginTop: "10px" }}
+      />
+
+      
+
+      {/* Sidebar editing (via ⚙️) */}
+      {showSidebar && (
+        <div className="annotation-editor-sidebar">
+          <h4>Annotation Sidebar</h4>
+          <label>Επιλογή:</label>
+          <select
+            value={selectedAnnotationIndex ?? ""}
+            onChange={(e) => {
+              const index = parseInt(e.target.value);
+              setSelectedAnnotationIndex(index);
+              setEditTitle(annotations[index]?.title || "");
+              setEditDescription(annotations[index]?.description || "");
+            }}
+          >
+            <option value="" disabled>-- Επιλογή --</option>
+            {annotations.map((ann, i) => (
+              <option key={i} value={i}>{ann.title || `Annotation ${i + 1}`}</option>
+            ))}
+          </select>
+
+          {selectedAnnotationIndex !== null && (
+            <>
+              <label>Τίτλος:
+                <input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
+              </label>
+              <label>Περιγραφή:
+                <textarea value={editDescription} onChange={(e) => setEditDescription(e.target.value)} />
+              </label>
+              <button
+                onClick={() => {
+                  const updated = [...annotations];
+                  updated[selectedAnnotationIndex].title = editTitle;
+                  updated[selectedAnnotationIndex].description = editDescription;
+                  setAnnotations(updated);
+                }}
+              >
+                Αποθήκευση
+              </button>
+            </>
+          )}
+        </div>
+      )}
     </div>
-  </div>
-)}
-
-  </div>
-
-
-)}
+  );
+};
 
 export default CanvasArea;

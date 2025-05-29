@@ -169,6 +169,8 @@ const UploadPage = () => {
         canvasRef={canvasRef}
         title={title}
         description={description}
+        setTitle={setTitle}
+        setDescription={setDescription}
       />
 
       {showResizeModal && (
