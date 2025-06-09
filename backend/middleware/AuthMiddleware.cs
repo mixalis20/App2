@@ -1,65 +1,55 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Primitives;
-using System.Threading.Tasks;
 using System.Linq;
-using MongoDB.Driver;
+using Microsoft.IdentityModel.Tokens;
 
-namespace App2.Models
+public class JwtHelper
 {
-    public class AuthenticationMiddleware
+    private readonly string _jwtSecret;
+
+    public JwtHelper(string jwtSecret)
     {
-        private readonly RequestDelegate _next;
-        private readonly IConfiguration _configuration;
+        _jwtSecret = jwtSecret;
+    }
 
-        public AuthenticationMiddleware(RequestDelegate next, IConfiguration configuration)
+    public string ValidateTokenAndGetUserId(string token)
+    {
+        if (string.IsNullOrEmpty(token))
+            throw new ArgumentException("No token provided");
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        try
         {
-            _next = next;
-            _configuration = configuration;
+            var key = System.Text.Encoding.UTF8.GetBytes(_jwtSecret);
+
+            // Validate token parameters
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+
+                ValidateIssuer = false,   // set true if you want to validate issuer
+                ValidateAudience = false, // set true if you want to validate audience
+
+                ClockSkew = TimeSpan.Zero // optional: no clock skew allowed
+            };
+
+            // Validate token and get principal
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+
+            // Extract userId claim
+            var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == "userId");
+
+            if (userIdClaim == null)
+                throw new SecurityTokenException("UserId claim not found");
+
+            return userIdClaim.Value;
         }
-
-        public async Task InvokeAsync(HttpContext context)
+        catch (Exception ex)
         {
-            if (context.Request.Headers.TryGetValue("Authorization", out StringValues authorizationHeader))
-            {
-                var token = authorizationHeader.ToString().Split(" ")[1];
-
-                if (string.IsNullOrEmpty(token))
-                {
-                    context.Response.StatusCode = 403;
-                    await context.Response.WriteAsync("{\"error\": \"No token provided\"}");
-                    return;
-                }
-
-                try
-                {
-                    var handler = new JwtSecurityTokenHandler();
-                    var key = _configuration["JWT_SECRET"];
-
-                    var tokenS = handler.ReadJwtToken(token);
-                    if (tokenS == null)
-                    {
-                        context.Response.StatusCode = 401;
-                        await context.Response.WriteAsync("{\"error\": \"Invalid or expired token\"}");
-                        return;
-                    }
-
-                    context.Items["UserId"] = tokenS.Claims.First(c => c.Type == "userId").Value;
-                    await _next(context);
-                }
-                catch (Exception)
-                {
-                    context.Response.StatusCode = 401;
-                    await context.Response.WriteAsync("{\"error\": \"Invalid or expired token\"}");
-                }
-            }
-            else
-            {
-                context.Response.StatusCode = 403;
-                await context.Response.WriteAsync("{\"error\": \"No token provided\"}");
-            }
+            // You can catch specific exceptions if needed, e.g. SecurityTokenExpiredException
+            throw new SecurityTokenException("Invalid or expired token", ex);
         }
     }
 }

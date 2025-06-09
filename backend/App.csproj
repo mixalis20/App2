@@ -10,16 +10,18 @@
 
   <!-- Εξαρτήσεις για το project -->
   <ItemGroup>
-    <!-- ASP.NET Core Web API εξαρτήσεις -->
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
 
-    <!-- MongoDB εξάρτηση -->
-    <PackageReference Include="MongoDB.Driver" Version="3.2.1" />
+    <!-- SQL Server EF Core -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0" />
 
-    <!-- BCrypt για κρυπτογράφηση κωδικών -->
+    <!-- BCrypt for password hashing -->
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
   </ItemGroup>
+
 
 </Project>

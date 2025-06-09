@@ -7,65 +7,115 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using MongoDB.Bson;
-using MongoDB.Driver;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text;
 using System;
+using System.Linq;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
+using System.Data.SqlClient;
 
 namespace App2
 {
-    // MongoDB context
-    public class MongoDBContext
+    // SqlConnection
+    public class SqlServerContext
     {
-        private readonly IMongoDatabase _database;
+        private readonly string _imageDbConnection;
+        private readonly string _userDbConnection;
 
-        public MongoDBContext(string connectionString)
+        public SqlServerContext(string imageDbConnection, string userDbConnection)
         {
-            var client = new MongoClient(connectionString);
-            _database = client.GetDatabase("ImageDatabase");
-            _database = client.GetDatabase("UserDatabase");
+            _imageDbConnection = imageDbConnection;
+            _userDbConnection = userDbConnection;
         }
 
-        public IMongoCollection<Image> Images => _database.GetCollection<Image>("Images");
-        public IMongoCollection<User> Users => _database.GetCollection<User>("Users");
+        public SqlConnection GetImageDbConnection()
+        {
+            var connection = new SqlConnection(_imageDbConnection);
+            connection.Open();
+            return connection;
+        }
+
+        public SqlConnection GetUserDbConnection()
+        {
+            var connection = new SqlConnection(_userDbConnection);
+            connection.Open();
+            return connection;
+        }
     }
 
     // Models
-    public class User
+   public class User
     {
-        public ObjectId Id { get; set; }
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
         public string Username { get; set; }
+
+        [Required]
         public string PasswordHash { get; set; }
+
         public DateTime CreatedAt { get; set; }
-        public List<ObjectId> ImageIds { get; set; } = new List<ObjectId>();
+
+        public List<Image> Images { get; set; } = new List<Image>();
     }
 
     public class Image
     {
         [Key]
-        public ObjectId Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
         public string ImageUrl { get; set; }
 
         public List<Annotation> Annotations { get; set; } = new();
-        public List<string> Tags { get; set; } = new();
-        public List<string> Category { get; set; }
+        public List<ImageTag> Tags { get; set; } = new();
+        public List<ImageCategory> Categories { get; set; } = new();
+
         public bool Deleted { get; set; } = false;
+
+        public int UserId { get; set; }
+        public User User { get; set; }
     }
 
     public class Annotation
     {
+        [Key]
+        public int Id { get; set; }
+
         public string Title { get; set; }
         public string Description { get; set; }
+
+        public int ImageId { get; set; }
+        public Image Image { get; set; }
     }
+
+    public class ImageTag
+    {
+        [Key]
+        public int Id { get; set; }
+        public string Value { get; set; }
+
+        public int ImageId { get; set; }
+        public Image Image { get; set; }
+    }
+
+    public class ImageCategory
+    {
+        [Key]
+        public int Id { get; set; }
+        public string Value { get; set; }
+
+        public int ImageId { get; set; }
+        public Image Image { get; set; }
+    }
+
 
     // DTOs
     public class UserRegisterDto
@@ -85,10 +135,10 @@ namespace App2
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly MongoDBContext _context;
+        private readonly AppDbContext _context;
         private readonly IConfiguration _configuration;
 
-        public UserController(MongoDBContext context, IConfiguration configuration)
+        public UserController(AppDbContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
@@ -100,8 +150,7 @@ namespace App2
             if (userDto == null || string.IsNullOrEmpty(userDto.Username) || string.IsNullOrEmpty(userDto.Password))
                 return BadRequest("Invalid user data.");
 
-            var existingUser = await _context.Users.Find(u => u.Username == userDto.Username).FirstOrDefaultAsync();
-            if (existingUser != null)
+            if (await _context.Users.AnyAsync(u => u.Username == userDto.Username))
                 return BadRequest("User already exists.");
 
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
@@ -113,13 +162,13 @@ namespace App2
                 CreatedAt = DateTime.UtcNow
             };
 
-            await _context.Users.InsertOneAsync(user);
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id.ToString() }, new
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, new
             {
                 user.Id,
                 user.Username,
-                user.PasswordHash,
                 user.CreatedAt
             });
         }
@@ -130,7 +179,7 @@ namespace App2
             if (loginDto == null || string.IsNullOrEmpty(loginDto.Username) || string.IsNullOrEmpty(loginDto.Password))
                 return BadRequest("Invalid login data.");
 
-            var user = await _context.Users.Find(u => u.Username == loginDto.Username).FirstOrDefaultAsync();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == loginDto.Username);
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
                 return Unauthorized("Invalid username or password.");
 
@@ -140,12 +189,9 @@ namespace App2
 
         [HttpGet("{id}")]
         [Authorize]
-        public async Task<IActionResult> GetUser(string id)
+        public async Task<IActionResult> GetUser(int id)
         {
-            if (!ObjectId.TryParse(id, out var objectId))
-                return BadRequest("Invalid user ID format.");
-
-            var user = await _context.Users.Find(u => u.Id == objectId).FirstOrDefaultAsync();
+            var user = await _context.Users.Include(u => u.Images).FirstOrDefaultAsync(u => u.Id == id);
             if (user == null)
                 return NotFound();
 
@@ -154,11 +200,11 @@ namespace App2
                 user.Id,
                 user.Username,
                 user.CreatedAt,
-                user.ImageIds
+                ImageIds = user.Images.Select(i => i.Id).ToList()
             });
         }
 
-        [HttpPost("api/images")]
+        [HttpPost("images")]
         [Authorize]
         public async Task<IActionResult> UploadImageForAuthenticatedUser([FromForm] IFormFile file)
         {
@@ -166,10 +212,10 @@ namespace App2
                 return BadRequest("No file uploaded.");
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!ObjectId.TryParse(userId, out var userObjectId))
+            if (!int.TryParse(userId, out var userIntId))
                 return Unauthorized("Invalid user ID in token.");
 
-            var user = await _context.Users.Find(u => u.Id == userObjectId).FirstOrDefaultAsync();
+            var user = await _context.Users.Include(u => u.Images).FirstOrDefaultAsync(u => u.Id == userIntId);
             if (user == null)
                 return NotFound("User not found.");
 
@@ -177,7 +223,7 @@ namespace App2
             if (!Directory.Exists(uploadsFolder))
                 Directory.CreateDirectory(uploadsFolder);
 
-            var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+            var uniqueFileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
             var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
@@ -185,23 +231,16 @@ namespace App2
                 await file.CopyToAsync(stream);
             }
 
-            var imageUrl = $"/uploads/{uniqueFileName}";
-
             var image = new Image
             {
-                ImageUrl = imageUrl,
-                Category = new List<string>(),
-                Tags = new List<string>(),
-                Annotations = new List<Annotation>()
+                ImageUrl = $"/uploads/{uniqueFileName}",
+                UserId = userIntId
             };
 
-            await _context.Images.InsertOneAsync(image);
+            _context.Images.Add(image);
+            await _context.SaveChangesAsync();
 
-            user.ImageIds.Add(image.Id);
-            var update = Builders<User>.Update.Set(u => u.ImageIds, user.ImageIds);
-            await _context.Users.UpdateOneAsync(u => u.Id == userObjectId, update);
-
-            return CreatedAtAction(nameof(GetImage), new { id = image.Id.ToString() }, new
+            return CreatedAtAction(nameof(GetImage), new { id = image.Id }, new
             {
                 image.Id,
                 image.ImageUrl
@@ -209,12 +248,9 @@ namespace App2
         }
 
         [HttpGet("images/{id}")]
-        public async Task<IActionResult> GetImage(string id)
+        public async Task<IActionResult> GetImage(int id)
         {
-            if (!ObjectId.TryParse(id, out var objectId))
-                return BadRequest("Invalid image ID format.");
-
-            var image = await _context.Images.Find(i => i.Id == objectId).FirstOrDefaultAsync();
+            var image = await _context.Images.FindAsync(id);
             if (image == null)
                 return NotFound();
 
@@ -243,7 +279,7 @@ namespace App2
 
         private string GenerateJwtToken(string userId)
         {
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Secret"]);
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -259,6 +295,21 @@ namespace App2
         }
     }
 
+    //AppDbContext
+    public class AppDbContext : DbContext
+    {
+        public AppDbContext(DbContextOptions<AppDbContext> options)
+            : base(options)
+        {
+        }
+
+        public DbSet<User> Users { get; set; }
+        public DbSet<Image> Images { get; set; }
+        public DbSet<Annotation> Annotations { get; set; }
+        public DbSet<ImageTag> ImageTags { get; set; }
+        public DbSet<ImageCategory> ImageCategories { get; set; }
+    }
+
     // Startup
     public class Startup
     {
@@ -270,33 +321,34 @@ namespace App2
             Configuration = configuration;
         }
 
-        public void ConfigureServices(IServiceCollection services)
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddControllers();
+
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+        var key = Encoding.ASCII.GetBytes(Configuration["Jwt:Secret"]);
+
+        services.AddAuthentication(options =>
         {
-            services.AddControllers();
-
-           var mongoConnectionString = Configuration["MongoDB:ConnectionString"];
-           services.AddSingleton(new MongoDBContext(mongoConnectionString));
-
-
-            var key = Encoding.ASCII.GetBytes(Configuration["Jwt:Secret"]);
-            services.AddAuthentication(options =>
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.RequireHttpsMetadata = false;
+            options.SaveToken = true;
+            options.TokenValidationParameters = new TokenValidationParameters
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false;
-                options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
-            });
-        }
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false
+            };
+        });
+    }
+
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
