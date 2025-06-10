@@ -2646,7 +2646,7 @@
   },
   "projectFileDependencyGroups": {
     "net6.0": [
-      "BCrypt.Net-Next >= 4.0.1",
+      "BCrypt.Net-Next >= 4.0.2",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 5.0.9",
       "Microsoft.AspNetCore.Cors >= 2.2.0",
       "Microsoft.AspNetCore.Mvc.NewtonsoftJson >= 5.0.10",
@@ -2702,7 +2702,7 @@
         "dependencies": {
           "BCrypt.Net-Next": {
             "target": "Package",
-            "version": "[4.0.1, )"
+            "version": "[4.0.2, )"
           },
           "Microsoft.AspNetCore.Authentication.JwtBearer": {
             "target": "Package",
@@ -2751,17 +2751,5 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300\\RuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "App depends on BCrypt.Net-Next (>= 4.0.1) but BCrypt.Net-Next 4.0.1 was not found. BCrypt.Net-Next 4.0.2 was resolved instead.",
-      "libraryId": "BCrypt.Net-Next",
-      "targetGraphs": [
-        "net6.0"
-      ]
-    }
-  ]
+  }
 }

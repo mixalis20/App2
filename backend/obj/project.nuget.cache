@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "54BLvLavweA=",
+  "dgSpecHash": "Epx6V7wyWW4=",
   "success": true,
   "projectFilePath": "C:\\Users\\Praktiki3\\Documents\\GitHub\\App2\\backend\\App.csproj",
   "expectedPackageFiles": [
@@ -67,18 +67,5 @@
     "C:\\Users\\Praktiki3\\.nuget\\packages\\system.text.encodings.web\\4.5.0\\system.text.encodings.web.4.5.0.nupkg.sha512",
     "C:\\Users\\Praktiki3\\.nuget\\packages\\system.windows.extensions\\4.7.0\\system.windows.extensions.4.7.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "message": "App depends on BCrypt.Net-Next (>= 4.0.1) but BCrypt.Net-Next 4.0.1 was not found. BCrypt.Net-Next 4.0.2 was resolved instead.",
-      "projectPath": "C:\\Users\\Praktiki3\\Documents\\GitHub\\App2\\backend\\App.csproj",
-      "warningLevel": 1,
-      "filePath": "C:\\Users\\Praktiki3\\Documents\\GitHub\\App2\\backend\\App.csproj",
-      "libraryId": "BCrypt.Net-Next",
-      "targetGraphs": [
-        "net6.0"
-      ]
-    }
-  ]
+  "logs": []
 }

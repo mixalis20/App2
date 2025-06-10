@@ -19,7 +19,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0" />
 
     <!-- BCrypt for password hashing -->
-    <PackageReference Include="BCrypt.Net-Next" Version="4.0.1" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
     <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
   </ItemGroup>
 
