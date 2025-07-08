@@ -6,10 +6,10 @@
     "configurations": [
         
         {
-            "name": "C#: <project-name> Debug",
+            "name": "C#: APP2 Debug",
             "type": "dotnet",
             "request": "launch",
-            "projectPath": "${workspaceFolder}/<relative-path-to-project-folder><project-name>.csproj"
+            "projectPath": "APP2/backend/App.csproj"
         }
 
 

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <!-- Ρύθμιση του στόχου πλατφόρμας -->
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
 
     <!-- Ρύθμιση του τύπου εξόδου για Web API -->
     <OutputType>Exe</OutputType>
@@ -16,10 +16,14 @@
 
     <!-- SQL Server EF Core -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.6">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
 
     <!-- BCrypt for password hashing -->
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
+    <PackageReference Include="Minio" Version="6.0.4" />
     <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
   </ItemGroup>
 

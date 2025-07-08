@@ -1,24 +1,24 @@
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.IdentityModel.Tokens.Jwt;
+using System.IO;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
+using App2.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
-using System.IO;
-using System.Text;
-using System;
-using System.Linq;
-using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Authorization;
-using System.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 
 namespace App2
 {
@@ -49,86 +49,7 @@ namespace App2
         }
     }
 
-    // Models
-   public class User
-    {
-        [Key]
-        public int Id { get; set; }
-
-        [Required]
-        public string Username { get; set; }
-
-        [Required]
-        public string PasswordHash { get; set; }
-
-        public DateTime CreatedAt { get; set; }
-
-        public List<Image> Images { get; set; } = new List<Image>();
-    }
-
-    public class Image
-    {
-        [Key]
-        public int Id { get; set; }
-
-        [Required]
-        public string ImageUrl { get; set; }
-
-        public List<Annotation> Annotations { get; set; } = new();
-        public List<ImageTag> Tags { get; set; } = new();
-        public List<ImageCategory> Categories { get; set; } = new();
-
-        public bool Deleted { get; set; } = false;
-
-        public int UserId { get; set; }
-        public User User { get; set; }
-    }
-
-    public class Annotation
-    {
-        [Key]
-        public int Id { get; set; }
-
-        public string Title { get; set; }
-        public string Description { get; set; }
-
-        public int ImageId { get; set; }
-        public Image Image { get; set; }
-    }
-
-    public class ImageTag
-    {
-        [Key]
-        public int Id { get; set; }
-        public string Value { get; set; }
-
-        public int ImageId { get; set; }
-        public Image Image { get; set; }
-    }
-
-    public class ImageCategory
-    {
-        [Key]
-        public int Id { get; set; }
-        public string Value { get; set; }
-
-        public int ImageId { get; set; }
-        public Image Image { get; set; }
-    }
-
-
-    // DTOs
-    public class UserRegisterDto
-    {
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
-
-    public class UserLoginDto
-    {
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
+    
 
     // Controller
     [Route("api/users")]
