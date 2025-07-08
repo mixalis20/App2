@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
@@ -36,14 +36,14 @@ namespace App2
 
         public SqlConnection GetImageDbConnection()
         {
-            var connection = new SqlConnection(_imageDbConnection);
+            var connection = new Microsoft.Data.SqlClient.SqlConnection(_imageDbConnection);
             connection.Open();
             return connection;
         }
 
         public SqlConnection GetUserDbConnection()
         {
-            var connection = new SqlConnection(_userDbConnection);
+            var connection = new Microsoft.Data.SqlClient.SqlConnection(_userDbConnection);
             connection.Open();
             return connection;
         }
