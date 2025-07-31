@@ -36,14 +36,14 @@ namespace App2
 
         public SqlConnection GetImageDbConnection()
         {
-            var connection = new Microsoft.Data.SqlClient.SqlConnection(_imageDbConnection);
+            var connection = new SqlConnection(_imageDbConnection);
             connection.Open();
             return connection;
         }
 
         public SqlConnection GetUserDbConnection()
         {
-            var connection = new Microsoft.Data.SqlClient.SqlConnection(_userDbConnection);
+            var connection = new SqlConnection(_userDbConnection);
             connection.Open();
             return connection;
         }
@@ -140,21 +140,23 @@ namespace App2
             if (user == null)
                 return NotFound("User not found.");
 
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
+            // MinIO upload
+            var minioService = new MinioService("minio:9000", "George", "George123");
+            var bucketName = "user-images";
             var uniqueFileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            // Ensure bucket exists
+            if (!await minioService.BucketExistsAsync(bucketName))
+                await minioService.MakeBucketAsync(bucketName);
+
+            using (var stream = file.OpenReadStream())
             {
-                await file.CopyToAsync(stream);
+                await minioService.PutObjectAsync(bucketName, uniqueFileName, stream, file.Length, file.ContentType);
             }
 
             var image = new Image
             {
-                ImageUrl = $"/uploads/{uniqueFileName}",
+                ImageUrl = uniqueFileName, 
                 UserId = userIntId
             };
 
