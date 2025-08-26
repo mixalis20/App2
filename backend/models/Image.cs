@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -19,6 +20,13 @@ namespace App2.Models
 
         public int UserId { get; set; }
         public User User { get; set; }
+
+        // Add status and created date
+        [Required]
+        public string Status { get; set; } = "complete";
+
+        [Required]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 
     public class Annotation
